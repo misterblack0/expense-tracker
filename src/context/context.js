@@ -1,12 +1,14 @@
 /* eslint-disable react/prop-types */
 import React, { useReducer, createContext } from "react";
 
+import contextReducer from "./contextReducer";
+
 const initialState = [];
 
 export const ExpenseTrackerContext = createContext(initialState);
 
 export const Provider = ({ children }) => {
-    const [state, dispatch] = useReducer(reducer, initialState);
+    const [state, dispatch] = useReducer(contextReducer, initialState);
 
     return (
         <ExpenseTrackerContext.Provider value={{ appName: "Expense Tracker" }}>
