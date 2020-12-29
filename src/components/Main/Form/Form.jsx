@@ -1,4 +1,5 @@
-import React, { useState, useContext } from "react";
+/* eslint-disable no-undef */
+import React, { useState, useContext, useEffect } from "react";
 import {
     TextField,
     Typography,
@@ -12,6 +13,7 @@ import {
 import { ExpenseTrackerContext } from "../../../context/context";
 import { v4 as uuidv4 } from "uuid";
 import { incomeCategories, expenseCategories } from "../../../constants/categories";
+import { useSpeechContext } from "@speechly/react-client";
 import formatDate from "../../../utils/formatDate";
 import useStyles from "./styles";
 
@@ -26,6 +28,7 @@ const Form = () => {
     const classes = useStyles();
     const [formData, setFOrmData] = useState(initialState);
     const { addTransaction } = useContext(ExpenseTrackerContext);
+    const { segment } = useSpeechContext();
 
     const createTransaction = () => {
         const transaction = { ...formData, amount: Number(formData.amount), id: uuidv4() };
@@ -34,13 +37,31 @@ const Form = () => {
         setFOrmData(initialState);
     };
 
+    useEffect(() => {
+        if (segment) {
+            if (segment.intent.intent === "add_expense") {
+                setFormData({ ...formData, type: "Expense" });
+            } else if (segment.intent.intent === "add_income") {
+                setFormData({ ...formData, type: "Income" });
+        } else if (segment.isFinal && segment.intent.intent === "create_transaction") {
+            return createTransaction();
+        } else if (segment.isFinal && segment.intent.intent === "cancel_transaction") {
+            return setFormData(initialState);
+        }
+
+segment.entities.forEach((e)=> {
+    
+})
+
+    }, [segment]);
+
     const selectedCategories = formData.type === "Income" ? incomeCategories : expenseCategories;
 
     return (
         <Grid container spacing={2}>
             <Grid item xs={12}>
                 <Typography align="center" variant="subtitle2" gutterBottom>
-                    ...
+                    {segment && segment.words.map((w) => w.value).join(" ")}
                 </Typography>
             </Grid>
             <Grid item cs={6}>
