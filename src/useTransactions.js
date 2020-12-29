@@ -13,7 +13,7 @@ const useTransactions = (title) => {
     console.log({ transactionsPerType, total, categories });
 
     transactionsPerType.forEach((t) => {
-        const category = categories.findIndex((c) => c.type === t.category);
+        const category = categories.find((c) => c.type === t.category);
 
         if (category) category.amount += t.amount;
     });
